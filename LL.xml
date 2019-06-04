@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25" zv="Cache for Windows (x86-64) 2018.1.2 (Build 309U_SU)" ts="2019-06-04 22:57:05">
+<Class name="LL.CC">
+<Description>
+Cabin Crew - Personel Pokładowy</Description>
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor,LL.OSOBA</Super>
+<TimeChanged>65168,79969.315789</TimeChanged>
+<TimeCreated>65166,47731.252755</TimeCreated>
+
+<Property name="NazwiskoImie">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="POPSPEC" value="Name()"/>
+</Property>
+
+<Property name="Rodzaj">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value=",CC1,CC2,CC3,CC4,Chief,Control"/>
+</Property>
+
+<Method name="przedstawSie">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	write !, "Nazwisko,Imię: ", ..NazwiskoImie
+	write !, "Plec: ", ..Plec
+	write !, "Tytul: ", ..Rodzaj
+	write !, "Pracuje dla: ", ..PracujaDla.Nazwa
+	write !
+	return 0
+]]></Implementation>
+</Method>
+
+<Method name="pokazDaneCCzBazy">
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+	&sql(declare ID cursor for select * into :cc() from LL.CC)
+	&sql(open ID)
+	write !, " ------------"
+	write !,"OID   Nazwisko i Imie     Pesel       Plec     PracujeDla      Rodzaj"
+	for 
+	{
+		&sql(fetch ID)
+		quit:(SQLCODE '=0)
+		write !, cc(1),"     ",cc(2), "   ",cc(3), "    ", cc(4), "  ", cc(5), "  ", cc(6)
+		
+	}
+	
+	&sql(close ID)
+]]></Implementation>
+</Method>
+
+<Property name="PracujaDla">
+<Type>LL.FIRMA</Type>
+<Cardinality>one</Cardinality>
+<Inverse>PosiadaCC</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="PracujaDlaIndex">
+<Properties>PracujaDla</Properties>
+</Index>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^LL.CCD</DataLocation>
+<DefaultData>CCDefaultData</DefaultData>
+<IdLocation>^LL.CCD</IdLocation>
+<IndexLocation>^LL.CCI</IndexLocation>
+<StreamLocation>^LL.CCS</StreamLocation>
+<ExtentSize>4</ExtentSize>
+<Data name="CCDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>NazwiskoImie</Value>
+</Value>
+<Value name="3">
+<Value>Plec</Value>
+</Value>
+<Value name="4">
+<Value>Pesel</Value>
+</Value>
+<Value name="5">
+<Value>Rodzaj</Value>
+</Value>
+<Value name="6">
+<Value>PracujaDla</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="%%ID">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>2</AverageFieldSize>
+</Property>
+<Property name="NazwiskoImie">
+<Selectivity>25.0000%</Selectivity>
+<AverageFieldSize>16.5</AverageFieldSize>
+</Property>
+<Property name="Pesel">
+<Selectivity>25.0000%</Selectivity>
+<AverageFieldSize>11</AverageFieldSize>
+</Property>
+<Property name="Plec">
+<Selectivity>50.0000%</Selectivity>
+<AverageFieldSize>7.5</AverageFieldSize>
+</Property>
+<Property name="PracujaDla">
+<Selectivity>50.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="Rodzaj">
+<Selectivity>25.0000%</Selectivity>
+<AverageFieldSize>3.5</AverageFieldSize>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="PracujaDlaIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+
+
+<Class name="LL.FIRMA">
+<Super>%Persistent,%Populate</Super>
+<TimeChanged>65168,78999.235023</TimeChanged>
+<TimeCreated>65166,51956.164535</TimeCreated>
+
+<Property name="Nazwa">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Index name="NazwaIndex">
+<Properties>Nazwa</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Property name="Kraj">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="PosiadaFlote">
+<Type>LL.SAMOLOT</Type>
+<Cardinality>many</Cardinality>
+<Inverse>NalezyDo</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="PosiadaPilotow">
+<Type>LL.PILOCI</Type>
+<Cardinality>many</Cardinality>
+<Inverse>PracujaDla</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Property name="PosiadaCC">
+<Type>LL.CC</Type>
+<Cardinality>many</Cardinality>
+<Inverse>PracujaDla</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^LL.FIRMAD</DataLocation>
+<DefaultData>FIRMADefaultData</DefaultData>
+<IdLocation>^LL.FIRMAD</IdLocation>
+<IndexLocation>^LL.FIRMAI</IndexLocation>
+<StreamLocation>^LL.FIRMAS</StreamLocation>
+<ExtentSize>10</ExtentSize>
+<Data name="FIRMADefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Nazwa</Value>
+</Value>
+<Value name="3">
+<Value>Kraj</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="%%ID">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>1.4</AverageFieldSize>
+</Property>
+<Property name="Kraj">
+<Selectivity>10.0000%</Selectivity>
+<AverageFieldSize>6.1</AverageFieldSize>
+</Property>
+<Property name="Nazwa">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>6.4</AverageFieldSize>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="NazwaIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+
+
+<Class name="LL.OSOBA">
+<Abstract>1</Abstract>
+<TimeChanged>65168,68492.568105</TimeChanged>
+<TimeCreated>65166,47728.666627</TimeCreated>
+
+<Property name="NazwiskoImie">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Plec">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value=",Mezczyzna,Kobieta"/>
+</Property>
+
+<Property name="Pesel">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="99999999999"/>
+<Parameter name="MINVAL" value="11111111111"/>
+</Property>
+
+<Index name="PeselIndex">
+<Properties>Pesel</Properties>
+</Index>
+
+<Method name="przedstawSie">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	set cos = "Nazwisko, Imię: " + ..NazwiskoImie + "  Płeć: " + ..Plec + " Pesel: " + ..Pesel 
+	return cos
+]]></Implementation>
+</Method>
+</Class>
+
+
+<Class name="LL.PILOCI">
+<Super>%Persistent,%Populate,%XML.Adaptor,%ZEN.DataModel.Adaptor,LL.OSOBA</Super>
+<TimeChanged>65168,80789.27579</TimeChanged>
+<TimeCreated>65166,52732.53252</TimeCreated>
+
+<Property name="NazwiskoImie">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="POPSPEC" value="Name()"/>
+</Property>
+
+<Property name="Telefon">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="POPSPEC" value="USPhone()"/>
+</Property>
+
+<Property name="Doswiadczenie">
+<Type>RANGA</Type>
+<Required>1</Required>
+</Property>
+
+<Method name="przedstawSie">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	write !, "Nazwisko,Imię: ", ..NazwiskoImie
+	write !, "Płeć: ", ..Plec
+	write !, "Pesel: ", ..Pesel
+	write !, "Telefon: ", ..Telefon
+	write !, "Ranga: ", ..Doswiadczenie.Tytul
+	write !, "Liczba godzin w powietrzu: ", ..Doswiadczenie.PrzelataneGodziny
+	write !, "Pracuje dla firmy: ", ..PracujaDla.Nazwa
+	write !
+	return 0
+]]></Implementation>
+</Method>
+
+<Method name="leciSamolotem">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	write !, "Pilot: ", ..NazwiskoImie
+	write !, "Steruje samolotem: ", ..sterujeSamolotem.Nazwa
+	write !, "o typie: ",..sterujeSamolotem.Typ.TypSamolotu
+	write !, "majac na pokladzie: ",..sterujeSamolotem.LiczbaPasazerow, " pasazerow"
+]]></Implementation>
+</Method>
+
+<Property name="sterujeSamolotem">
+<Type>LL.SAMOLOT</Type>
+<Cardinality>one</Cardinality>
+<Inverse>MaPilotow</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="sterujeSamolotemIndex">
+<Properties>sterujeSamolotem</Properties>
+</Index>
+
+<Property name="PracujaDla">
+<Type>LL.FIRMA</Type>
+<Cardinality>one</Cardinality>
+<Inverse>PosiadaPilotow</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="PracujaDlaIndex">
+<Properties>PracujaDla</Properties>
+</Index>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^LL.PILOCID</DataLocation>
+<DefaultData>PILOCIDefaultData</DefaultData>
+<IdLocation>^LL.PILOCID</IdLocation>
+<IndexLocation>^LL.PILOCII</IndexLocation>
+<StreamLocation>^LL.PILOCIS</StreamLocation>
+<ExtentSize>7</ExtentSize>
+<Data name="PILOCIDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>NazwiskoImie</Value>
+</Value>
+<Value name="3">
+<Value>Plec</Value>
+</Value>
+<Value name="4">
+<Value>Doswiadczenie</Value>
+</Value>
+<Value name="5">
+<Value>Pesel</Value>
+</Value>
+<Value name="6">
+<Value>Telefon</Value>
+</Value>
+<Value name="7">
+<Value>sterujeSamolotem</Value>
+</Value>
+<Value name="8">
+<Value>PracujaDla</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="%%ID">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="Doswiadczenie">
+<Selectivity>14.2857%,PrzelataneGodziny:14.2857%,Tytul:33.3333%</Selectivity>
+<AverageFieldSize>15.43,PrzelataneGodziny:3.86,Tytul:9.43</AverageFieldSize>
+</Property>
+<Property name="NazwiskoImie">
+<Selectivity>14.2857%</Selectivity>
+<AverageFieldSize>15.29</AverageFieldSize>
+</Property>
+<Property name="Pesel">
+<Selectivity>14.2857%</Selectivity>
+<AverageFieldSize>11</AverageFieldSize>
+</Property>
+<Property name="Plec">
+<Selectivity>50.0000%</Selectivity>
+<AverageFieldSize>8.14</AverageFieldSize>
+</Property>
+<Property name="PracujaDla">
+<Selectivity>16.6667%</Selectivity>
+<AverageFieldSize>1.43</AverageFieldSize>
+</Property>
+<Property name="Telefon">
+<Selectivity>14.2857%</Selectivity>
+<AverageFieldSize>12</AverageFieldSize>
+</Property>
+<Property name="sterujeSamolotem">
+<Selectivity>20.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="PracujaDlaIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="sterujeSamolotemIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+
+
+<Package name="LL" sqlname="LL"/>
+
+
+<Class name="LL.RANGA">
+<Super>%SerialObject,%Populate</Super>
+<TimeChanged>65168,69934.945059</TimeChanged>
+<TimeCreated>65166,51784.647911</TimeCreated>
+
+<Property name="PrzelataneGodziny">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="9999"/>
+<Parameter name="MINVAL" value="1"/>
+</Property>
+
+<Property name="Tytul">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value=",Kapitan,FirstOfficer,SecondOfficer"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheSerialState</Type>
+<State>RANGAState</State>
+<StreamLocation>^LL.RANGAS</StreamLocation>
+<Data name="RANGAState">
+<Value name="1">
+<Value>Tytul</Value>
+</Value>
+<Value name="2">
+<Value>PrzelataneGodziny</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+
+
+<Class name="LL.SAMOLOT">
+<Super>%Persistent,%Populate</Super>
+<TimeChanged>65168,77551.979249</TimeChanged>
+<TimeCreated>65166,60400.061561</TimeCreated>
+
+<Property name="Nazwa">
+<Type>%String</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="Typ">
+<Type>TYP</Type>
+<Required>1</Required>
+</Property>
+
+<Property name="MiejscePochodzenia">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="POPSPEC" value="City()"/>
+</Property>
+
+<Property name="LiczbaPasazerow">
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="300"/>
+<Parameter name="MINVAL" value="70"/>
+</Property>
+
+<Property name="RozpietoscSkrzydel">
+<Description>
+w metrach</Description>
+<Type>%Integer</Type>
+<Required>1</Required>
+<Parameter name="MAXVAL" value="100"/>
+<Parameter name="MINVAL" value="10"/>
+</Property>
+
+<Method name="okreslRodzajSamolotu">
+<ReturnType>%String</ReturnType>
+<Implementation><![CDATA[
+	if ..LiczbaPasazerow > 200 && ..RozpietoscSkrzydel > 80 {
+	set result = "SAMOLOT KLASY A"
+	
+	}
+	ELSEIF ..LiczbaPasazerow > 200 && ..RozpietoscSkrzydel < 80 {
+		set result = "SAMOLOT KLASY A-"
+	
+	}
+	elseif ..LiczbaPasazerow > 150 && ..RozpietoscSkrzydel > 60 {
+	set result = "SAMOLOT KLASY B"
+	
+	}
+	ELSEIF ..LiczbaPasazerow > 150 && ..RozpietoscSkrzydel < 60 {
+		set result = "SAMOLOT KLASY B-"
+	
+	}
+	elseif ..LiczbaPasazerow > 100 && ..RozpietoscSkrzydel > 50 {
+	set result = "SAMOLOT KLASY C"
+	
+	}
+	ELSEIF ..LiczbaPasazerow > 100 && ..RozpietoscSkrzydel < 50 {
+		set result = "SAMOLOT KLASY C-"
+	}
+	else {
+		set result = "SAMOLOT KLASY D"
+	}
+	 
+	 return result
+]]></Implementation>
+</Method>
+
+<Method name="okreslWlasciciela">
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[	write !,"Samolot: ",..Nazwa, " należy do firmy: " , ..NalezyDo.Nazwa
+]]></Implementation>
+</Method>
+
+<Property name="NalezyDo">
+<Type>LL.FIRMA</Type>
+<Cardinality>one</Cardinality>
+<Inverse>PosiadaFlote</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Index name="NalezyDoIndex">
+<Properties>NalezyDo</Properties>
+</Index>
+
+<Property name="MaPilotow">
+<Type>LL.PILOCI</Type>
+<Cardinality>many</Cardinality>
+<Inverse>sterujeSamolotem</Inverse>
+<Relationship>1</Relationship>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^LL.SAMOLOTD</DataLocation>
+<DefaultData>SAMOLOTDefaultData</DefaultData>
+<IdLocation>^LL.SAMOLOTD</IdLocation>
+<IndexLocation>^LL.SAMOLOTI</IndexLocation>
+<StreamLocation>^LL.SAMOLOTS</StreamLocation>
+<ExtentSize>5</ExtentSize>
+<Data name="SAMOLOTDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Nazwa</Value>
+</Value>
+<Value name="3">
+<Value>Typ</Value>
+</Value>
+<Value name="4">
+<Value>MiejscePochodzenia</Value>
+</Value>
+<Value name="5">
+<Value>LiczbaPasazerow</Value>
+</Value>
+<Value name="6">
+<Value>RozpietoscSkrzydel</Value>
+</Value>
+<Value name="7">
+<Value>NalezyDo</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="%%ID">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="LiczbaPasazerow">
+<Selectivity>20.0000%</Selectivity>
+<AverageFieldSize>2.8</AverageFieldSize>
+</Property>
+<Property name="MiejscePochodzenia">
+<Selectivity>20.0000%</Selectivity>
+<AverageFieldSize>6.8</AverageFieldSize>
+</Property>
+<Property name="NalezyDo">
+<Selectivity>50.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="Nazwa">
+<Selectivity>20.0000%</Selectivity>
+<AverageFieldSize>5</AverageFieldSize>
+</Property>
+<Property name="RozpietoscSkrzydel">
+<Selectivity>20.0000%</Selectivity>
+<AverageFieldSize>2</AverageFieldSize>
+</Property>
+<Property name="Typ">
+<Selectivity>33.3333%,TypSamolotu:33.3333%</Selectivity>
+<AverageFieldSize>8.8,TypSamolotu:6.8</AverageFieldSize>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="NalezyDoIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+
+
+<Class name="LL.TYP">
+<Super>%SerialObject,%Populate</Super>
+<TimeChanged>65166,60381.432275</TimeChanged>
+<TimeCreated>65166,51518.7311</TimeCreated>
+
+<Property name="TypSamolotu">
+<Type>%String</Type>
+<Required>1</Required>
+<Parameter name="VALUELIST" value=",Dash,Embraier,Boening737,Boening787"/>
+</Property>
+
+<Storage name="Default">
+<Type>%Library.CacheSerialState</Type>
+<State>TYPState</State>
+<StreamLocation>^LL.TYPS</StreamLocation>
+<Data name="TYPState">
+<Value name="1">
+<Value>TypSamolotu</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
